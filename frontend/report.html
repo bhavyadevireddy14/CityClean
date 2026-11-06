@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Report Complaint - CityClean</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🗑️ Report Garbage Complaint</h1>
+
+        <label>Name</label>
+        <input id="name"
+               type="text"
+               placeholder="Enter Your Name">
+
+        <label>Location</label>
+        <input id="location"
+               type="text"
+               placeholder="Enter Location">
+
+        <label>Description</label>
+        <textarea id="description"
+                  placeholder="Describe the issue"></textarea>
+
+        <label>Image</label>
+        <input type="file">
+
+        <button onclick="submitComplaint()">
+            Submit Complaint
+        </button>
+
+        <br><br>
+
+        <a href="index.html">
+            <button>
+                Back To Home
+            </button>
+        </a>
+
+    </div>
+
+<script src="js/app.js"></script>
+
+</body>
+
+</html>

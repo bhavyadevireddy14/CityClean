@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🗑️ Admin Dashboard</h1>
+
+<div class="stats">
+
+<div class="card">
+<h3>Total Complaints</h3>
+<p id="totalComplaints">0</p>
+</div>
+
+<div class="card">
+<h3>Pending</h3>
+<p id="pendingComplaints">0</p>
+</div>
+
+<div class="card">
+<h3>Resolved</h3>
+<p id="resolvedComplaints">0</p>
+</div>
+
+</div>
+
+<br>
+
+
+<table>
+
+<thead>
+
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Location</th>
+<th>Priority</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+
+</thead>
+
+<tbody id="complaintTable">
+
+</tbody>
+
+</table>
+
+<br>
+
+<a href="index.html">
+<button>
+Back To Home
+</button>
+</a>
+
+</div>
+
+<script src="js/app.js"></script>
+
+<script>
+
+loadComplaints();
+
+</script>
+
+</body>
+
+</html>

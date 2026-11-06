@@ -1,0 +1,25 @@
+Project Name:
+CityClean
+
+Theme:
+Build the Future
+
+Category:
+Smart Cities / Waste Management
+
+Problem:
+Citizens struggle to report waste issues and track their resolution.
+
+Solution:
+A web application where citizens can report waste complaints while authorities can manage and resolve them efficiently.
+
+Core Features:
+1. Report Complaint
+2. Track Complaint
+3. Admin Dashboard
+4. Priority Management
+
+Tech Stack:
+Frontend: HTML, CSS, JavaScript
+Backend: Python Flask
+Database: SQLite
