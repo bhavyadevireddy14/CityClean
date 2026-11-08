@@ -227,33 +227,35 @@ async function loadComplaints() {
     );
 }
 
-function updateStatus(id,status){
+async function updateStatus(id, status) {
 
-    const complaints =
-    JSON.parse(
-    localStorage.getItem(
-    "complaints"
-    )
-    ) || [];
+    try {
 
-    const complaint =
-    complaints.find(
-    c => c.id === id
-    );
+        await fetch(
+            `http://127.0.0.1:5000/api/complaints/${id}/status`,
+            {
+                method: "PATCH",
 
-    if(complaint){
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-        complaint.status =
-        status;
-
-        localStorage.setItem(
-        "complaints",
-        JSON.stringify(
-        complaints
-        )
+                body: JSON.stringify({
+                    status: status
+                })
+            }
         );
 
         loadComplaints();
+
     }
 
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            "Could not update status"
+        );
+    }
 }
