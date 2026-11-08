@@ -1,13 +1,20 @@
+
 async function submitComplaint() {
 
     const name =
-        document.getElementById("name").value;
+        document.getElementById("name").value.trim();
 
     const location =
-        document.getElementById("location").value;
+        document.getElementById("location").value.trim();
 
     const description =
-        document.getElementById("description").value;
+        document.getElementById("description").value.trim();
+
+    const imageInput =
+        document.getElementById("image");
+
+    const imageFile =
+        imageInput.files[0];
 
     if (
         name === "" ||
@@ -18,42 +25,51 @@ async function submitComplaint() {
         return;
     }
 
+    if (!imageFile) {
+        alert("Please select an image");
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("name", name);
+    formData.append("location", location);
+    formData.append("description", description);
+    formData.append("image", imageFile);
+
     try {
 
         const response = await fetch(
             "http://127.0.0.1:5000/api/complaints",
             {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    name: name,
-                    location: location,
-                    description: description
-                })
+                body: formData
             }
         );
 
         const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Complaint submission failed"
+            );
+        }
 
         alert(
             "Complaint Submitted Successfully!\nComplaint ID: "
             + data.complaint.id
         );
 
-        window.location.href =
-            "admin.html";
+        window.location.href = "admin.html";
 
     } catch (error) {
 
         console.error(error);
 
-        alert(
-            "Could not connect to backend"
-        );
+        alert(error.message || "Could not connect to backend");
     }
 }
+
 async function trackComplaint() {
 
     const id =
@@ -176,6 +192,24 @@ async function loadComplaints() {
             <td>${complaint.name}</td>
 
             <td>${complaint.location}</td>
+
+            <!-- NEW IMAGE COLUMN -->
+            <td>
+            ${
+            complaint.image_url
+            ?
+            `<img
+            src="http://127.0.0.1:5000${complaint.image_url}"
+            alt="Complaint Image"
+            width="100"
+            height="80"
+            style="object-fit: cover; border-radius: 8px;"
+            >`
+            :
+            "No Image"
+            }
+            </td>
+            <!-- END NEW IMAGE COLUMN -->
 
             <td>${complaint.priority}</td>
 
