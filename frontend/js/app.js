@@ -1,4 +1,4 @@
-function submitComplaint() {
+async function submitComplaint() {
 
     const name =
         document.getElementById("name").value;
@@ -18,232 +18,213 @@ function submitComplaint() {
         return;
     }
 
-    let priority = "Low";
+    try {
 
-    if(location.toLowerCase().includes("hospital")){
-        priority = "High";
+        const response = await fetch(
+            "http://127.0.0.1:5000/api/complaints",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: name,
+                    location: location,
+                    description: description
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        alert(
+            "Complaint Submitted Successfully!\nComplaint ID: "
+            + data.complaint.id
+        );
+
+        window.location.href =
+            "admin.html";
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Could not connect to backend"
+        );
     }
-    else if(location.toLowerCase().includes("school")){
-        priority = "High";
-    }
-    else if(location.toLowerCase().includes("market")){
-        priority = "Medium";
-    }
-
-    const complaints =
-        JSON.parse(
-            localStorage.getItem("complaints")
-        ) || [];
-
-    const complaint = {
-
-        id: complaints.length + 1,
-
-        name: name,
-
-        location: location,
-
-        description: description,
-
-        priority: priority,
-
-        status: "Pending"
-    };
-
-    complaints.push(complaint);
-
-    localStorage.setItem(
-        "complaints",
-        JSON.stringify(complaints)
-    );
-
-    alert(
-        "Complaint Submitted Successfully!\nComplaint ID: "
-        + complaint.id
-    );
-
-    window.location.href =
-        "admin.html";
 }
-
-function trackComplaint() {
+async function trackComplaint() {
 
     const id =
-    document.getElementById(
-    "complaintId"
-    ).value;
-
-    const complaints =
-    JSON.parse(
-    localStorage.getItem(
-    "complaints"
-    )
-    ) || [];
-
-    const complaint =
-    complaints.find(
-    c => c.id == id
-    );
+        document.getElementById(
+            "complaintId"
+        ).value;
 
     const result =
-    document.getElementById(
-    "result"
-    );
+        document.getElementById(
+            "result"
+        );
 
-    if(complaint){
+    try {
 
-        result.innerHTML = `
+        const response = await fetch(
+            `http://127.0.0.1:5000/api/complaints/${id}`
+        );
 
-        <h3>
-        Complaint Found
-        </h3>
+        const complaint =
+            await response.json();
 
-        <p>
-        <strong>ID:</strong>
-        ${complaint.id}
-        </p>
+        if(response.ok){
 
-        <p>
-        <strong>Name:</strong>
-        ${complaint.name}
-        </p>
+            result.innerHTML = `
 
-        <p>
-        <strong>Location:</strong>
-        ${complaint.location}
-        </p>
+            <h3>Complaint Found</h3>
 
-        <p>
-        <strong>Priority:</strong>
-        ${complaint.priority}
-        </p>
+            <p><strong>ID:</strong>
+            ${complaint.id}</p>
 
-        <p>
-        <strong>Status:</strong>
-        ${complaint.status}
-        </p>
+            <p><strong>Name:</strong>
+            ${complaint.name}</p>
 
-        `;
+            <p><strong>Location:</strong>
+            ${complaint.location}</p>
+
+            <p><strong>Priority:</strong>
+            ${complaint.priority}</p>
+
+            <p><strong>Status:</strong>
+            ${complaint.status}</p>
+
+            `;
+        }
+
+        else{
+
+            result.innerHTML =
+            "<h3>Complaint Not Found</h3>";
+
+        }
+
     }
 
-    else{
+    catch(error){
 
         result.innerHTML =
-
-        "<h3>Complaint Not Found</h3>";
+        "<h3>Error Connecting To Server</h3>";
 
     }
 }
 
-function loadComplaints() {
+async function loadComplaints() {
 
-    const complaints =
-    JSON.parse(
-    localStorage.getItem("complaints")
-    ) || [];
+    const response = await fetch(
+        "http://127.0.0.1:5000/api/complaints"
+    );
+
+    const complaints = await response.json();
 
     const totalComplaints =
-document.getElementById(
-"totalComplaints"
-);
+        document.getElementById(
+            "totalComplaints"
+        );
 
-const pendingComplaints =
-document.getElementById(
-"pendingComplaints"
-);
+    const pendingComplaints =
+        document.getElementById(
+            "pendingComplaints"
+        );
 
-const resolvedComplaints =
-document.getElementById(
-"resolvedComplaints"
-);
+    const resolvedComplaints =
+        document.getElementById(
+            "resolvedComplaints"
+        );
 
-if(totalComplaints){
+    if(totalComplaints){
 
-totalComplaints.innerText =
-complaints.length;
+        totalComplaints.innerText =
+            complaints.length;
 
-pendingComplaints.innerText =
-complaints.filter(
-c => c.status === "Pending"
-).length;
+        pendingComplaints.innerText =
+            complaints.filter(
+                c => c.status === "Pending"
+            ).length;
 
-resolvedComplaints.innerText =
-complaints.filter(
-c => c.status === "Resolved"
-).length;
-
-}
+        resolvedComplaints.innerText =
+            complaints.filter(
+                c => c.status === "Resolved"
+            ).length;
+    }
 
     const table =
-    document.getElementById(
-    "complaintTable"
-    );
+        document.getElementById(
+            "complaintTable"
+        );
 
     if(!table) return;
 
     table.innerHTML = "";
 
     complaints.forEach(
-    complaint => {
+        complaint => {
 
-    table.innerHTML += `
+            table.innerHTML += `
 
-    <tr>
+            <tr>
 
-    <td>${complaint.id}</td>
+            <td>${complaint.id}</td>
 
-    <td>${complaint.name}</td>
+            <td>${complaint.name}</td>
 
-    <td>${complaint.location}</td>
+            <td>${complaint.location}</td>
 
-    <td>${complaint.priority}</td>
+            <td>${complaint.priority}</td>
 
-    <td>${complaint.status}</td>
+            <td>${complaint.status}</td>
 
-    <td>
+            <td>
 
-    <select
-    onchange="updateStatus(
-    ${complaint.id},
-    this.value
-    )">
+            <select
+            onchange="updateStatus(
+            ${complaint.id},
+            this.value
+            )">
 
-    <option
-    ${complaint.status === "Pending" ?
-    "selected" : ""}>
+            <option
+            ${complaint.status ===
+            "Pending" ?
+            "selected" : ""}>
 
-    Pending
+            Pending
 
-    </option>
+            </option>
 
-    <option
-    ${complaint.status ===
-    "In Progress" ?
-    "selected" : ""}>
+            <option
+            ${complaint.status ===
+            "In Progress" ?
+            "selected" : ""}>
 
-    In Progress
+            In Progress
 
-    </option>
+            </option>
 
-    <option
-    ${complaint.status ===
-    "Resolved" ?
-    "selected" : ""}>
+            <option
+            ${complaint.status ===
+            "Resolved" ?
+            "selected" : ""}>
 
-    Resolved
+            Resolved
 
-    </option>
+            </option>
 
-    </select>
+            </select>
 
-    </td>
+            </td>
 
-    </tr>
+            </tr>
 
-    `;
-
-    });
-
+            `;
+        }
+    );
 }
 
 function updateStatus(id,status){
