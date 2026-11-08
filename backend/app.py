@@ -25,8 +25,8 @@ def init_db():
 
 init_db()
 
-# Temporary storage
-complaints = []
+
+
 
 # Home Route
 @app.route("/")
@@ -39,7 +39,7 @@ def add_complaint():
 
     data = request.json
 
-    complaint_id = len(complaints) + 1
+    
 
     location = data.get("location", "").lower()
 
@@ -56,63 +56,162 @@ def add_complaint():
         priority = "Low"
 
     complaint = {
-        "id": complaint_id,
         "name": data.get("name"),
         "location": data.get("location"),
         "description": data.get("description"),
         "priority": priority,
         "status": "Pending"
     }
+    conn = sqlite3.connect("backend/database.db")
 
-    complaints.append(complaint)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO complaints
+        (name, location, description, priority, status)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (
+        complaint["name"],
+        complaint["location"],
+        complaint["description"],
+        complaint["priority"],
+        complaint["status"]
+        )
+    )
+
+    conn.commit()
+
+    complaint["id"] = cursor.lastrowid
+
+    conn.close()
 
     return jsonify({
-        "message": "Complaint Submitted Successfully",
-        "complaint": complaint
+    "message": "Complaint Submitted Successfully",
+    "complaint": complaint
     })
+
+    
 
 # View All Complaints
 @app.route("/api/complaints", methods=["GET"])
 def get_complaints():
 
-    return jsonify(complaints)
+    conn = sqlite3.connect(
+        "backend/database.db"
+    )
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT
+        id,
+        name,
+        location,
+        description,
+        priority,
+        status
+    FROM complaints
+    """)
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    complaints_data = []
+
+    for row in rows:
+
+        complaints_data.append({
+            "id": row[0],
+            "name": row[1],
+            "location": row[2],
+            "description": row[3],
+            "priority": row[4],
+            "status": row[5]
+        })
+
+    return jsonify(complaints_data)
+
+
 
 # View Single Complaint
 @app.route("/api/complaints/<int:id>", methods=["GET"])
 def get_complaint(id):
 
-    for complaint in complaints:
+    conn = sqlite3.connect(
+        "backend/database.db"
+    )
 
-        if complaint["id"] == id:
-            return jsonify(complaint)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+        id,
+        name,
+        location,
+        description,
+        priority,
+        status
+        FROM complaints
+        WHERE id = ?
+        """,
+        (id,)
+    )
+
+    row = cursor.fetchone()
+
+    conn.close()
+
+    if row:
+
+        return jsonify({
+            "id": row[0],
+            "name": row[1],
+            "location": row[2],
+            "description": row[3],
+            "priority": row[4],
+            "status": row[5]
+        })
 
     return jsonify({
         "message": "Complaint Not Found"
     }), 404
 
 # Update Status
+# Update Status
 @app.route("/api/complaints/<int:id>/status", methods=["PATCH"])
 def update_status(id):
 
     data = request.json
 
-    for complaint in complaints:
+    conn = sqlite3.connect(
+        "backend/database.db"
+    )
 
-        if complaint["id"] == id:
+    cursor = conn.cursor()
 
-            complaint["status"] = data.get(
-                "status",
-                complaint["status"]
-            )
+    cursor.execute(
+        """
+        UPDATE complaints
+        SET status = ?
+        WHERE id = ?
+        """,
+        (
+            data.get("status"),
+            id
+        )
+    )
 
-            return jsonify({
-                "message": "Status Updated",
-                "complaint": complaint
-            })
+    conn.commit()
+
+    conn.close()
 
     return jsonify({
-        "message": "Complaint Not Found"
-    }), 404
+        "message": "Status Updated"
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
