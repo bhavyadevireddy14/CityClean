@@ -1,7 +1,29 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import sqlite3
 app = Flask(__name__)
 CORS(app)
+def init_db():
+
+    conn = sqlite3.connect("backend/database.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS complaints (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        location TEXT,
+        description TEXT,
+        priority TEXT,
+        status TEXT
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+init_db()
 
 # Temporary storage
 complaints = []
