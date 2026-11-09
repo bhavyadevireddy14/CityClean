@@ -1,4 +1,3 @@
-
 import os
 import uuid
 import sqlite3
@@ -95,6 +94,21 @@ def add_complaint():
     if not name or not location or not description:
         return jsonify({
             "message": "Please fill all fields"
+        }), 400
+
+    if len(name) < 2 or len(name) > 80:
+        return jsonify({
+            "message": "Name must be between 2 and 80 characters"
+        }), 400
+
+    if len(location) < 2 or len(location) > 150:
+        return jsonify({
+            "message": "Location must be between 2 and 150 characters"
+        }), 400
+
+    if len(description) < 10 or len(description) > 1000:
+        return jsonify({
+        "message": "Description must be between 10 and 1000 characters"
         }), 400
 
     if not image_file or image_file.filename == "":
@@ -312,3 +326,4 @@ def update_status(id):
 
 if __name__ == "__main__":
     app.run(debug=True)
+
