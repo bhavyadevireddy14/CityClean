@@ -40,7 +40,7 @@ async function submitComplaint() {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:5000/api/complaints",
+            "https://cityclean-1756.onrender.com/api/complaints",
             {
                 method: "POST",
                 body: formData
@@ -85,7 +85,7 @@ async function trackComplaint() {
     try {
 
         const response = await fetch(
-            `http://127.0.0.1:5000/api/complaints/${id}`
+            `https://cityclean-1756.onrender.com/api/complaints/${id}`
         );
 
         const complaint =
@@ -135,7 +135,7 @@ async function trackComplaint() {
 async function loadComplaints() {
 
     const response = await fetch(
-        "http://127.0.0.1:5000/api/complaints"
+        "https://cityclean-1756.onrender.com/api/complaints"
     );
 
     const complaints = await response.json();
@@ -199,7 +199,7 @@ async function loadComplaints() {
             complaint.image_url
             ?
             `<img
-            src="http://127.0.0.1:5000${complaint.image_url}"
+            src="https://cityclean-1756.onrender.com${complaint.image_url}"
             alt="Complaint Image"
             width="100"
             height="80"
@@ -266,7 +266,7 @@ async function updateStatus(id, status) {
     try {
 
         await fetch(
-            `http://127.0.0.1:5000/api/complaints/${id}/status`,
+            `https://cityclean-1756.onrender.com/api/complaints/${id}/status`,
             {
                 method: "PATCH",
 
